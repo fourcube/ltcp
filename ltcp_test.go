@@ -78,3 +78,29 @@ func TestServerActuallyResponds(t *testing.T) {
 
 	close(done)
 }
+
+func TestServerActuallyRespondsDuringListenAny(t *testing.T) {
+	done := make(chan struct{})
+	addr, err := ltcp.ListenAny(ltcp.EchoHandler, done)
+
+	conn, err := net.Dial("tcp", addr.String())
+	if err != nil {
+		t.Errorf("Expected no error, got %v", err)
+	}
+
+	testPayload := "foo"
+	recvBuf := make([]byte, 32)
+	conn.Write([]byte(testPayload))
+
+	n, err := conn.Read(recvBuf)
+	if err != nil {
+		t.Errorf("Expected no error, got %v", err)
+	}
+
+	data := string(recvBuf[:n])
+	if data != "foo" {
+		t.Errorf("Expected to receive '%s' from the echo handler, got '%s'", testPayload, data)
+	}
+
+	close(done)
+}
