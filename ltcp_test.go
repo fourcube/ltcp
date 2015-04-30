@@ -8,7 +8,7 @@ import (
 )
 
 func TestListen(t *testing.T) {
-	listenAddress := "127.0.0.1:12345"
+	listenAddress := "127.0.0.1:54429"
 	done := make(chan struct{})
 
 	err := ltcp.Listen(listenAddress, ltcp.EchoHandler, done)
@@ -20,7 +20,7 @@ func TestListen(t *testing.T) {
 }
 
 func TestAddressAlreadyInUse(t *testing.T) {
-	listenAddress := "127.0.0.1:12345"
+	listenAddress := "127.0.0.1:54429"
 	done := make(chan struct{})
 
 	err := ltcp.Listen(listenAddress, ltcp.EchoHandler, done)
@@ -52,7 +52,7 @@ func TestListenAny(t *testing.T) {
 }
 
 func TestServerActuallyResponds(t *testing.T) {
-	listenAddress := "127.0.0.1:12345"
+	listenAddress := "127.0.0.1:54429"
 	done := make(chan struct{})
 
 	err := ltcp.Listen(listenAddress, ltcp.EchoHandler, done)
