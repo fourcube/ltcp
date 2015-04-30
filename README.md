@@ -20,7 +20,7 @@ func main() {
 	// Listens on some random, available port on all interfaces
 	// handles all connections with the ltcp.EchoHandler
 	//
-	// You can close the 'done' channel to end the connection.
+	// You can close the 'done' channel to stop the listener.
 	//
 	done := make(chan struct{})
 	addr, err :=	ltcp.ListenAny(ltcp.EchoHandler, done)
