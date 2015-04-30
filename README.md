@@ -1,6 +1,6 @@
 # ltcp
 
-[![GoDoc](https://godoc.org/github.com/fourcube/ltcp?status.svg)](http://godoc.org/github.com/fourcube/ltcp)
+[![GoDoc](https://godoc.org/github.com/fourcube/ltcp?status.svg)](http://godoc.org/github.com/fourcube/ltcp) [![Build Status](https://travis-ci.org/fourcube/ltcp.svg?branch=master)](https://travis-ci.org/fourcube/ltcp)
 
 ltcp is a simple library providing an easy way to spawn tcp handlers. It might be useful for your tests.
 
