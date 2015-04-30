@@ -49,29 +49,27 @@ func ListenAny(handler ConnectionHandler, done chan struct{}) (addr *net.TCPAddr
 func listen(ln net.Listener, handler ConnectionHandler, done chan struct{}) {
 	// This implementation does not block, but instead runs it's
 	// accept -> handle loop inside a goroutine
-	go func() {
-		for {
-			select {
-			// When the 'done' channel gets closed or receives
-			// the echo server's ln gets shut down
-			case <-done:
-				ln.Close()
+	for {
+		select {
+		// When the 'done' channel gets closed or receives
+		// the echo server's ln gets shut down
+		case <-done:
+			ln.Close()
+			return
+
+		default:
+			conn, err := ln.Accept()
+
+			if err != nil {
+				log.Printf("Error during accept, %v ", err)
 				return
-
-			default:
-				conn, err := ln.Accept()
-
-				if err != nil {
-					log.Printf("Error during accept, %v ", err)
-					return
-				}
-
-				// Do all the work inside the supplied goroutine so we can quickly accept
-				// other connections
-				go handler(conn)
 			}
+
+			// Do all the work inside the supplied goroutine so we can quickly accept
+			// other connections
+			go handler(conn)
 		}
-	}()
+	}
 }
 
 // EchoHandler simply returns everything that is received to the client himself
