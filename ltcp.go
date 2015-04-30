@@ -1,4 +1,4 @@
-// ltcp provides a simple function for launching tcp servers e.g. for
+// Package ltcp provides a simple function for launching tcp servers e.g. for
 // testing.
 package ltcp
 
@@ -8,6 +8,8 @@ import (
 	"net"
 )
 
+// ConnectionHandler is a alias for the func(net.Conn) type. ConnectionHandlers can be passed
+// to the Listen* functions. Every client connection is processed by a ConnectionHandler.
 type ConnectionHandler func(net.Conn)
 
 // Listen on 'addr' serving all client connections with 'handler'
