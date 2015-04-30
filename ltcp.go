@@ -42,6 +42,7 @@ func ListenAny(handler ConnectionHandler, done chan struct{}) (addr *net.TCPAddr
 		log.Printf("Couldn't resolve %v, %v", ln.Addr(), err)
 	}
 
+	go listen(ln, handler, done)
 	return
 }
 
