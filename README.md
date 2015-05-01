@@ -13,14 +13,14 @@ package main
 
 import (
 	"github.com/fourcube/ltcp"
- 	"net"	
+ 	"net"
 )
 
 func main() {
 	// Listens on some random, available port on all interfaces
 	// handles all connections with the ltcp.EchoHandler
 	//
-	// You can close the 'done' channel to stop the listener.
+	// You can send ltcp.Shutdown through the 'done' channel to stop the listener.
 	//
 	done := make(chan struct{})
 	addr, err :=	ltcp.ListenAny(ltcp.EchoHandler, done)
@@ -33,7 +33,10 @@ func main() {
 	// ... do whatever with the connection
 
 	conn.Close()
-	close(done)
+	// The listener will shutdown when it receives something on the done channel
+	// It then closes the done channel
+	done <- ltcp.Shutdown
+	<-done
 }
 ```
 

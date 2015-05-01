@@ -1,6 +1,7 @@
 package ltcp_test
 
 import (
+	"log"
 	"net"
 	"testing"
 
@@ -16,10 +17,11 @@ func TestListen(t *testing.T) {
 		t.Errorf("Expected no error, got %v", err)
 	}
 
-	close(done)
+	done <- ltcp.Shutdown
+	<-done
 }
 
-func TestAddressAlreadyInUse(t *testing.T) {
+func TestShutdown(t *testing.T) {
 	listenAddress := "127.0.0.1:54429"
 	done := make(chan struct{})
 
@@ -28,12 +30,34 @@ func TestAddressAlreadyInUse(t *testing.T) {
 		t.Errorf("Expected no error, got %v", err)
 	}
 
-	err = ltcp.Listen(listenAddress, ltcp.EchoHandler, done)
+	done <- ltcp.Shutdown
+	<-done
+
+	_, err = net.Dial("tcp", listenAddress)
+	if err == nil {
+		t.Errorf("Expected error when connecting to shut down server, got nil")
+	}
+}
+
+func TestAddressAlreadyInUse(t *testing.T) {
+	listenAddress := "127.0.0.1:54429"
+	doneA := make(chan struct{})
+	doneB := make(chan struct{})
+
+	err := ltcp.Listen(listenAddress, ltcp.EchoHandler, doneA)
+	if err != nil {
+		t.Errorf("Expected no error, got %v", err)
+	}
+
+	err = ltcp.Listen(listenAddress, ltcp.EchoHandler, doneB)
 	if err == nil {
 		t.Errorf("Expected listen to fail when address is in use, got no error")
 	}
 
-	close(done)
+	doneA <- ltcp.Shutdown
+	<-doneA
+	// doneB will be closed because of the error
+	<-doneB
 }
 
 func TestListenAny(t *testing.T) {
@@ -48,7 +72,8 @@ func TestListenAny(t *testing.T) {
 		t.Errorf("Expected server to listen on some address, got nil")
 	}
 
-	close(done)
+	done <- ltcp.Shutdown
+	<-done
 }
 
 func TestServerActuallyResponds(t *testing.T) {
@@ -72,11 +97,13 @@ func TestServerActuallyResponds(t *testing.T) {
 	}
 
 	data := string(recvBuf[:n])
-	if data != "foo" {
+	if data != testPayload {
 		t.Errorf("Expected to receive '%s' from the echo handler, got '%s'", testPayload, data)
 	}
 
-	close(done)
+	done <- ltcp.Shutdown
+	log.Printf("After send done")
+	<-done
 }
 
 func TestServerActuallyRespondsDuringListenAny(t *testing.T) {
@@ -102,5 +129,6 @@ func TestServerActuallyRespondsDuringListenAny(t *testing.T) {
 		t.Errorf("Expected to receive '%s' from the echo handler, got '%s'", testPayload, data)
 	}
 
-	close(done)
+	done <- ltcp.Shutdown
+	<-done
 }
